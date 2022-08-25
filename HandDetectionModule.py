@@ -29,52 +29,18 @@ class handDetector():
                     self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
         return img
 
-    def
+    def getLendmarkPosition(self,handLms, img):
+        for id, lm in enumerate(handLms.landmark):
+            #get x,y landmarks positions
+            lmX = lm.x
+            lmY = lm.y
 
-        # for id, lm in enumerate(handLms.landmark):
-        #     #get x,y landmarks positions
-        #     lmX = lm.x
-        #     lmY = lm.y
-        #
-        #     #Convert lmX, lmY tp pixel location
-        #     h, w, c = img.shape
-        #     cx, cy = int(lmX * w), int(lmY * h)
-        #
-        #     #Set circle on each landmark
-        #     cv2.circle(img, (cx, cy), 15, (255, 0, 255), cv2.FILLED)
-        #
-        #     print(f"ID:{id}, {cx, cy}")
+            #Convert lmX, lmY tp pixel location
+            h, w, c = img.shape
+            cx, cy = int(lmX * w), int(lmY * h)
 
+            #Set circle on each landmark
+            cv2.circle(img, (cx, cy), 15, (255, 0, 255), cv2.FILLED)
 
-def main():
-    # previous an current time
-    pre_time = 0
-    cur_time = 0
+            print(f"ID:{id}, {cx, cy}")
 
-    # Receive video from camera 0
-    cap = cv2.VideoCapture(0)
-
-    detector = handDetector()
-
-    while True:
-        success, img = cap.read()
-
-        img = detector.findHands(img)
-        #fliping the img
-        img = cv2.flip(img,1)
-
-        # Calc the fps
-        cur_time = time.time()
-        fps = 1 / (cur_time - pre_time)
-        pre_time = cur_time
-
-        # Show FPS on video
-        cv2.putText(img, f"FPS: {str(int(fps))}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 3)
-
-        # Show window with img
-        cv2.imshow("Hey ;)", img)
-        cv2.waitKey(1)
-
-
-if __name__ == "__main__":
-    main()
