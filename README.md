@@ -54,6 +54,6 @@ This software uses the following open source packages:
 ## Related
 
 > GitHub [@AlmogShkt](https://github.com/AlmogShKt) &nbsp;&middot;&nbsp;
-> Linkdin [@amit_merchant](https://www.linkedin.com/in/almog-shtaigmann/)
+> Linkedin [@Almog Shtaigmann](https://www.linkedin.com/in/almog-shtaigmann/)
 
 
