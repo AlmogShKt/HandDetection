@@ -8,5 +8,8 @@ pip install mouse
 
 ```
 
+*The Cool Function are:
+**1.Control your mouse using the hand!
+  
 
 
