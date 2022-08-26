@@ -15,7 +15,8 @@ def main():
     while True:
         success, img = cap.read()
 
-        img = detector.findHands(img)
+        img = detector.findHands(img,False)
+        lmList = detector.getLendmarkPosition(img)
         #fliping the img
         img = cv2.flip(img,1)
 
