@@ -1,4 +1,5 @@
 from HandDetectionModule import handDetector
+from HandFunctions import Features
 import cv2
 import time
 
@@ -11,6 +12,7 @@ def main():
     cap = cv2.VideoCapture(0)
 
     detector = handDetector()
+    allFeature = Features()
 
     while True:
         success, img = cap.read()
@@ -19,6 +21,10 @@ def main():
         lmList = detector.getLendmarkPosition(img)
         #fliping the img
         img = cv2.flip(img,1)
+        if(lmList):
+            if allFeature.handIsClose(lmList):
+                print(f"Your Hand is Close!")
+
 
         # Calc the fps
         cur_time = time.time()

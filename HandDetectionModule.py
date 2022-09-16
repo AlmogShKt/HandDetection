@@ -1,11 +1,11 @@
 import cv2
 import mediapipe as mp
+import time
 
 class handDetector():
     """
     Hand detector class
     """
-
     def __init__(self, mode=False, max_hands=2, min_detection_confidence=0.5,
                  min_tracking_confidence=0.5):
         """Initializes a Hand Hand object.
@@ -72,7 +72,7 @@ class handDetector():
                 # Convert lmX, lmY tp pixel location
                 h, w, c = img.shape
                 cx, cy = int(lmX * w), int(lmY * h)
-                print(f"ID:{id}, {cx, cy}")
+                #print(f"ID:{id}, {cx, cy}")
                 self.lmList.append([id, cx, cy])
 
                 if draw:
@@ -82,6 +82,7 @@ class handDetector():
                         self.calcHCP()
                         # Draw the Circle on the center of the hand
                         cv2.circle(img, (self.handCenterPos), 10, (154, 239, 192), cv2.FILLED)
+            self.setFingers()
             return self.lmList
 
     def calcHCP(self):
@@ -98,3 +99,112 @@ class handDetector():
         :return: the Hand Center Position
         """
         return self.handCenterPos
+
+    def getlmList(self):
+        return  self.lmList
+
+    def setFingers(self):  # setting finger lendmarks
+        self.lm0 = self.lmList[0][1:3]
+        self.lm2 = self.lmList[2][1:3]
+        self.lm4 = self.lmList[4][1:3]
+        self.lm3 = self.lmList[3][1:3]
+        self.lm5 = self.lmList[5][1:3]
+        self.lm8 = self.lmList[8][1:3]
+        self.lm9 = self.lmList[9][1:3]
+        self.lm12 = self.lmList[12][1:3]
+        self.lm13 = self.lmList[13][1:3]
+        self.lm16 = self.lmList[16][1:3]
+        self.lm17 = self.lmList[17][1:3]
+        self.lm20 = self.lmList[20][1:3]
+
+    def calcDistanceBetweenFingers(self, f1, f2):
+        return ((((f2[0] - f1[0]) ** 2) + ((f2[1] - f1[1]) ** 2)) ** 0.5)
+
+    def addAvgDistance(self, count):
+        self.distanceBetweenFingersOpenHand[0] = (int(self.distanceBetweenFingersOpenHand[0]
+                                                      + self.calcDistanceBetweenFingers(self.lm4, self.lm8)) / count)
+        self.distanceBetweenFingersOpenHand[1] = (int(self.distanceBetweenFingersOpenHand[1]
+                                                      + self.calcDistanceBetweenFingers(self.lm8, self.lm12)) / count)
+        self.distanceBetweenFingersOpenHand[2] = (int(self.distanceBetweenFingersOpenHand[2]
+                                                      + self.calcDistanceBetweenFingers(self.lm12,self.lm16)) / count)
+        self.distanceBetweenFingersOpenHand[3] = (int(self.distanceBetweenFingersOpenHand[3]
+                                                      + self.calcDistanceBetweenFingers(self.lm16,self.lm20)) / count)
+        self.distanceBetweenFingersOpenHand[4] = (int(self.distanceBetweenFingersOpenHand[4]
+                                                      + self.calcDistanceBetweenFingers(self.lm20, self.lm4)) / count)
+    def initHandSize(self):
+        def pointIsInCircle(center_x,center_y,R,p_x,p_y):
+            return (p_x-center_x) **2 + (p_y-center_y)**2 < R**2
+
+        initStates = [
+            {0 : "Waiting"},
+            {1 : "Ready To Start"},
+            {2 : "Taking Samples"},
+            {3: "Done"},
+        ]
+        currentState = 0
+        self.distanceBetweenFingersOpenHand = [0,0,0,0,0]
+        # place 0: dis between lm4-lm8
+        # place 1: dis between lm8-lm12
+        # place 2: dis between lm12-l16
+        # place 3: dis between lm16-lm20
+        # place 4: dis between lm20-lm4
+        countInitTimes = 5
+        secForInit = 5
+        startTime = time.time()
+
+        cap = cv2.VideoCapture(0)
+
+        while True > 0:
+
+            success, img = cap.read()
+            img = self.findHands(img)
+            self.LmList = self.getLendmarkPosition(img)
+            img = cv2.flip(img, 1)
+
+            # Start init
+            if (currentState == 0):
+                cv2.putText(img, f"Lest Start the initialization! Open and place your hand in the middle of the screen", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                if(self.lmList):
+                    sec = 5
+                    cv2.putText(img,f"Place your hand above the circle ",(450, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
+                    cv2.circle(img, (1100,650), 70, (154, 239, 192), cv2.FILLED)
+                    cv2.putText(img, f"Hold for more {secForInit} second ", (550, 350), cv2.FONT_HERSHEY_SIMPLEX, 2,
+                                (255, 0, 0), 2)
+                    if(pointIsInCircle(1100,650,70,self.getHCP()[0]+220,self.getHCP()[1]) and (time.time() - startTime >= 1)):
+                        secForInit -= 1
+                        startTime = time.time()
+                    if(secForInit == 0):
+                        currentState += 1
+
+
+
+            elif(currentState == 1):
+                cv2.putText(img, (f"Taking {6 - countInitTimes} sampling of 5"), (750, 80),
+                            cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
+                if(self.lmList and (time.time() - startTime) >= 1):
+                    self.addAvgDistance(6-countInitTimes)
+                    startTime = time.time()
+                    countInitTimes -= 1
+                elif (countInitTimes == 0):
+                    currentState += 1
+            elif(currentState == 2):
+                img = cv2.imread("green-check-mark-.jpeg")
+
+
+
+
+
+            cv2.imshow("Initialize Hand Size", img)
+            cv2.waitKey(1)
+        print(self.distanceBetweenFingersOpenHand)
+
+
+def main():
+    D = handDetector()
+
+    D.initHandSize()
+
+
+
+if __name__ == "__main__":
+    main()
