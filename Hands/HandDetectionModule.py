@@ -101,9 +101,16 @@ class handDetector():
         return self.handCenterPos
 
     def getlmList(self):
-        return  self.lmList
+        """
+        :return: landmarks list
+        """
+        return self.lmList
 
-    def setFingers(self):  # setting finger lendmarks
+    def setFingers(self):
+        """
+        Set all relevant landmarks as class variables
+        :return:
+        """
         self.lm0 = self.lmList[0][1:3]
         self.lm2 = self.lmList[2][1:3]
         self.lm4 = self.lmList[4][1:3]
@@ -117,10 +124,21 @@ class handDetector():
         self.lm17 = self.lmList[17][1:3]
         self.lm20 = self.lmList[20][1:3]
 
-    def calcDistanceBetweenFingers(self, f1, f2):
-        return ((((f2[0] - f1[0]) ** 2) + ((f2[1] - f1[1]) ** 2)) ** 0.5)
+    def calcDistanceBetweenFingers(self, lm1, lm2):
+        """
+        Calc the distance between 2 given landmarks
+        :param lm1:
+        :param lm2:
+        :return: the distance(in pixels)
+        """
+        return ((((lm2[0] - lm1[0]) ** 2) + ((lm2[1] - lm1[1]) ** 2)) ** 0.5)
 
     def addAvgDistance(self, count):
+        """
+        Create avg of the distance between top of each finger
+        :param count: the current count of sum
+        :return:
+        """
         self.distanceBetweenFingersOpenHand[0] = (int(self.distanceBetweenFingersOpenHand[0]
                                                       + self.calcDistanceBetweenFingers(self.lm4, self.lm8)) / count)
         self.distanceBetweenFingersOpenHand[1] = (int(self.distanceBetweenFingersOpenHand[1]
@@ -131,59 +149,82 @@ class handDetector():
                                                       + self.calcDistanceBetweenFingers(self.lm16,self.lm20)) / count)
         self.distanceBetweenFingersOpenHand[4] = (int(self.distanceBetweenFingersOpenHand[4]
                                                       + self.calcDistanceBetweenFingers(self.lm20, self.lm4)) / count)
+
     def initHandSize(self):
+        """
+        Initialize the hand size, in order to calc other function in the future
+        :return: True when done the process
+        """
         def pointIsInCircle(center_x,center_y,R,p_x,p_y):
+            """
+            Check if given point is in given circle
+            :param center_x: X center of the circle
+            :param center_y: Y center of the circle
+            :param R: Radius of the circle
+            :param p_x: X center of the point
+            :param p_y: Y center of the point
+            :return: True if the point is in the circle
+            """
             return (p_x-center_x) **2 + (p_y-center_y)**2 < R**2
 
-        initStates = [
-            {0 : "Waiting"},
-            {1 : "Ready To Start"},
-            {2 : "Taking Samples"},
-            {3: "Done"},
-        ]
+        #All the sates in the process
+        initStates = {0: "Waiting",
+                      1: "Ready To Start",
+                      2: "Taking Samples",
+                      3: "Done"}
+
+        #The current state, start with 0
         currentState = 0
-        self.distanceBetweenFingersOpenHand = [0,0,0,0,0]
+
+        #The distance between the top of each finger
         # place 0: dis between lm4-lm8
         # place 1: dis between lm8-lm12
         # place 2: dis between lm12-l16
         # place 3: dis between lm16-lm20
         # place 4: dis between lm20-lm4
-        countInitTimes = 5
-        secForInit = 5
-        startTime = time.time()
+        self.distanceBetweenFingersOpenHand = [0,0,0,0,0]
 
+        #Hold the hand for 5 sec before start taking samples
+        secForInit = 5
+
+        #the amount of samples to take fot the avg
+        amountOfSamples = 5
+
+        #Wait 5 sec before end the proses
+        holdFor5Sec = 5
+
+        startTime = time.time()
         cap = cv2.VideoCapture(0)
 
         while True > 0:
-
             success, img = cap.read()
             img = self.findHands(img)
             self.LmList = self.getLendmarkPosition(img)
+            #flip the img
             img = cv2.flip(img, 1)
 
-            # Start init
             if (currentState == 0):
+                #instraction
                 cv2.putText(img, f"Lest Start the initialization! Open and place your hand in the middle of the screen", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                #Only when hand is detect
                 if(self.lmList):
-                    sec = 5
                     cv2.putText(img,f"Place your hand above the circle ",(450, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
-                    cv2.circle(img, (1100,650), 70, (154, 239, 192), cv2.FILLED)
-                    cv2.putText(img, f"Hold for more {secForInit} second ", (550, 350), cv2.FONT_HERSHEY_SIMPLEX, 2,
+                    cv2.putText(img, f"Hold for more {secForInit} second ", (550, 300), cv2.FONT_HERSHEY_SIMPLEX, 2,
                                 (255, 0, 0), 2)
-                    if(pointIsInCircle(1100,650,70,self.getHCP()[0]+220,self.getHCP()[1]) and (time.time() - startTime >= 1)):
+                    if(pointIsInCircle(1100,650,100,self.getHCP()[0]+220,self.getHCP()[1]) and (time.time() - startTime >= 1)):
                         secForInit -= 1
                         startTime = time.time()
                     if(secForInit == 0):
                         currentState += 1
 
             elif(currentState == 1):
-                cv2.putText(img, (f"Taking {6 - countInitTimes} sampling of 5"), (750, 80),
+                cv2.putText(img, (f"Taking {6 - amountOfSamples} sampling of 5"), (750, 80),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
                 if(self.lmList and (time.time() - startTime) >= 1):
-                    self.addAvgDistance(6-countInitTimes)
+                    self.addAvgDistance(6-amountOfSamples)
                     startTime = time.time()
-                    countInitTimes -= 1
-                elif (countInitTimes == 0):
+                    amountOfSamples -= 1
+                elif (amountOfSamples == 0):
                     currentState += 1
             elif(currentState == 2):
                 img = cv2.imread("green-check-mark-.jpeg")
