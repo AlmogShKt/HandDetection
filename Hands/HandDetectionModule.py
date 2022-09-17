@@ -176,8 +176,6 @@ class handDetector():
                     if(secForInit == 0):
                         currentState += 1
 
-
-
             elif(currentState == 1):
                 cv2.putText(img, (f"Taking {6 - countInitTimes} sampling of 5"), (750, 80),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
@@ -189,8 +187,6 @@ class handDetector():
                     currentState += 1
             elif(currentState == 2):
                 img = cv2.imread("green-check-mark-.jpeg")
-
-
 
 
 
