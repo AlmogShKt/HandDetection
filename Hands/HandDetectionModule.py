@@ -3,6 +3,16 @@ import mediapipe as mp
 import time
 
 
+def calcDistanceBetweenFingers(lm1, lm2):
+    """
+    Calc the distance between 2 given landmarks
+    :param lm1:
+    :param lm2:
+    :return: the distance(in pixels)
+    """
+    res = (((lm2[0] - lm1[0]) ** 2) + ((lm2[1] - lm1[1]) ** 2)) ** 0.5
+    return res
+
 class handDetector():
     """
     Hand detector class
@@ -51,7 +61,7 @@ class handDetector():
                     self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
         return img
 
-    def getLendmarkPosition(self, img, handNo=0, draw=True):
+    def getLendmarkPos(self, img, handNo=0, draw=True):
         """
         Getting the landmarks location on array.
         Can draw on the center of the hand a circle
@@ -63,6 +73,7 @@ class handDetector():
 
         # the list with all the landmarks
         self.lmList = []
+
         # Only if there is detection
         if self.result.multi_hand_landmarks:
             # Take only 1 hand (Hand number 0)
@@ -126,15 +137,6 @@ class handDetector():
         self.lm17 = self.lmList[17][1:3]
         self.lm20 = self.lmList[20][1:3]
 
-    def calcDistanceBetweenFingers(self, lm1, lm2):
-        """
-        Calc the distance between 2 given landmarks
-        :param lm1:
-        :param lm2:
-        :return: the distance(in pixels)
-        """
-        return ((((lm2[0] - lm1[0]) ** 2) + ((lm2[1] - lm1[1]) ** 2)) ** 0.5)
-
     def addAvgDistance(self, count):
         """
         Create avg of the distance between top of each finger
@@ -142,21 +144,26 @@ class handDetector():
         :return:
         """
         self.distanceBetweenFingersOpenHand[0] = (int(self.distanceBetweenFingersOpenHand[0]
-                                                      + self.calcDistanceBetweenFingers(self.lm4, self.lm8)) / count)
+                                                      + calcDistanceBetweenFingers(self.lm4, self.lm8)))
         self.distanceBetweenFingersOpenHand[1] = (int(self.distanceBetweenFingersOpenHand[1]
-                                                      + self.calcDistanceBetweenFingers(self.lm8, self.lm12)) / count)
+                                                      + calcDistanceBetweenFingers(self.lm8, self.lm12)))
         self.distanceBetweenFingersOpenHand[2] = (int(self.distanceBetweenFingersOpenHand[2]
-                                                      + self.calcDistanceBetweenFingers(self.lm12, self.lm16)) / count)
+                                                      + calcDistanceBetweenFingers(self.lm12, self.lm16)))
         self.distanceBetweenFingersOpenHand[3] = (int(self.distanceBetweenFingersOpenHand[3]
-                                                      + self.calcDistanceBetweenFingers(self.lm16, self.lm20)) / count)
+                                                      + calcDistanceBetweenFingers(self.lm16, self.lm20)))
         self.distanceBetweenFingersOpenHand[4] = (int(self.distanceBetweenFingersOpenHand[4]
-                                                      + self.calcDistanceBetweenFingers(self.lm20, self.lm4)) / count)
+                                                      + calcDistanceBetweenFingers(self.lm20, self.lm4)))
 
-    def initHandSize(self):
+        if count == 5:
+            for i in range(len(self.distanceBetweenFingersOpenHand)):
+                self.distanceBetweenFingersOpenHand[i] = self.distanceBetweenFingersOpenHand[i] / count
+                print(self.distanceBetweenFingersOpenHand[i])
+    def initHandSize(self,StatState = 0):
         """
         Initializes the hand size in order to get a relative size for future calculations
         The user needs to place his hand in the middle of the screen for 5 second, after that the system will calc the
         avg distance between his finger, and save it.
+        :param StatState: Option to start the rin form specific state for test, def should be 0!
         :return: True when done the process
         """
 
@@ -181,7 +188,7 @@ class handDetector():
                       2: "Done"}
 
         # The current state, start with 0
-        currentState = 0
+        currentState = StatState
 
         # The distance between the top of each finger
         # place 0: dis between lm4-lm8
@@ -205,7 +212,7 @@ class handDetector():
         while flag:
             success, img = cap.read()
             img = self.findHands(img)
-            self.LmList = self.getLendmarkPosition(img)
+            self.LmList = self.getLendmarkPos(img)
             # flip the img
             img = cv2.flip(img, 1)
 
@@ -229,23 +236,23 @@ class handDetector():
                     # When 5 sec passed - move to the next step
                     if secForInit == 0:
                         currentState += 1
-            #Start taking samples of the hand, and update the avg
+            # Start taking samples of the hand, and update the avg
             elif currentState == 1:
                 cv2.putText(img, f"Taking {6 - amountOfSamplesLeft} sampling of 5", (750, 80),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
                 # Only if the HCP in in the middle of the screen and 1 sec passed - count down
                 if self.lmList and (time.time() - startTime) >= 1:
-                    #up==Update the avg
+                    # up==Update the avg
                     self.addAvgDistance(6 - amountOfSamplesLeft)
                     startTime = time.time()
                     amountOfSamplesLeft -= 1
-                #After taking 5 samples move to the next step
+                # After taking 5 samples move to the next step
                 elif amountOfSamplesLeft == 0:
                     currentState += 1
-            #Done!
+            # Done!
             elif currentState == 2:
-                img = cv2.imread("Hands/green-check-mark-.jpeg")
-                #Show the image for 5 sec the end the init' process
+                img = cv2.imread("/Users/almogshtaigmann/PycharmProjects/HandDetection/Hands/green-check-mark-.jpeg")
+                # Show the image for 5 sec the end the init' process
                 if time.time() - startTime > 1:
                     holdFor5Sec -= 1
                     startTime = time.time()
@@ -253,12 +260,14 @@ class handDetector():
                     flag = False
                     print(self.distanceBetweenFingersOpenHand)
                     return True
+            try:
+                cv2.imshow(initStates[currentState], img)
+                cv2.waitKey(1)
+            except:
+                print(initStates[currentState])
 
-            cv2.imshow(initStates[currentState], img)
-            cv2.waitKey(1)
-
-        cv2.destroyWindow("done")
-
+    def getdistanceBetweenFingersOpenHand(self):
+        return self.distanceBetweenFingersOpenHand
 
 # test!
 def main():
