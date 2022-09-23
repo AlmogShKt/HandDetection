@@ -3,6 +3,31 @@ from HandFunctions import Features
 import cv2
 import time
 
+def drawMenu(img, draw):
+    if draw:
+        cv2.rectangle(img, (70, 10), (310, 100), (153, 153, 253), cv2.FILLED)
+        cv2.rectangle(img, (70, 10), (310, 100), (0,0 , 255))
+        cv2.putText(img, "Function 1", (100, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+
+        cv2.rectangle(img, (70, 110), (310, 200), (153, 153, 253), cv2.FILLED)
+        cv2.rectangle(img, (70, 110), (310, 200), (0, 0, 255))
+        cv2.putText(img, "Function 2", (100, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+
+        cv2.rectangle(img, (70, 210), (310, 300), (153, 153, 253), cv2.FILLED)
+        cv2.rectangle(img, (70, 210), (310, 300), (0, 0, 255))
+        cv2.putText(img, "Function 3", (100, 260), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+
+        cv2.rectangle(img, (70, 310), (310, 400), (153, 153, 253), cv2.FILLED)
+        cv2.rectangle(img, (70, 310), (310, 400), (0, 0, 255))
+        cv2.putText(img, "Function 4", (100, 360), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+
+        cv2.rectangle(img, (70, 410), (310, 500), (153, 153, 253), cv2.FILLED)
+        cv2.rectangle(img, (70, 410), (310, 500), (0, 0, 255))
+        cv2.putText(img, "Function 5", (100, 460), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+
+        return img
+    return img
+
 def main():
     # previous an current time
     pre_time = 0
@@ -19,37 +44,25 @@ def main():
     while True:
         success, img = cap.read()
 
+        img = drawMenu(cv2.flip(img, 1), True)
+
         img = detector.findHands(img)
         lmList = detector.getLendmarkPos(img)
-        #fliping the img
-        img = cv2.flip(img,1)
+        allFeature.setLmList(lmList)
 
         if lmList:
-            if allFeature.handIsClose(lmList):
-                cv2.rectangle(img, (10, 10), (1350, 100), (194, 214, 214), cv2.FILLED)
-            # lm1 = detector.getlmList()[4][1:3]
-            # lm2 = detector.getlmList()[8][1:3]
-            # print(f"\n/n{calcDistanceBetweenFingers(lm1,lm2)} , {detector.getdistanceBetweenFingersOpenHand()[0]}")
-            #
-            # lm1 = detector.getlmList()[8][1:3]
-            # lm2 = detector.getlmList()[12][1:3]
-            # print(f"{calcDistanceBetweenFingers(lm1,lm2)} , {detector.getdistanceBetweenFingersOpenHand()[1]}")
-            #
-            # lm1 = detector.getlmList()[12][1:3]
-            # lm2 = detector.getlmList()[16][1:3]
-            # print(f"{calcDistanceBetweenFingers(lm1,lm2)} , {detector.getdistanceBetweenFingersOpenHand()[2]}")
-            #
-            # lm1 = detector.getlmList()[20][1:3]
-            # lm2 = detector.getlmList()[4][1:3]
-            # print(f"{calcDistanceBetweenFingers(lm1,lm2)} , {detector.getdistanceBetweenFingersOpenHand()[4]}")
-            # time.sleep(1.5)
+            if allFeature.handIsClose():
+                cv2.rectangle(img, (590, 10), (830, 100), (194, 214, 214), cv2.FILLED)
+                cv2.putText(img,"Hand Is Close",(600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+            allFeature.moveMouse()
+
         # Calc the fps
         cur_time = time.time()
         fps = 1 / (cur_time - pre_time)
         pre_time = cur_time
 
         # Show FPS on video
-        cv2.putText(img, f"FPS: {str(int(fps))}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 3)
+        cv2.putText(img, f"FPS: {str(int(fps))}", (1750, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
 
         # Show window with img
         cv2.imshow("Hey ;)", img)

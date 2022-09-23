@@ -1,6 +1,32 @@
-p_x = 1123
-p_y = 745
-center_x = 650
-center_y = 1100
-R = 70
-print((p_x-center_x)**2 + (p_y-center_y)**2, R**2)
+from screeninfo import  get_monitors
+from pynput.mouse import Button, Controller
+
+for m in get_monitors():
+    if m.is_primary:
+        print(m)
+mouse = Controller()
+
+# Read pointer position
+print('The current pointer position is {0}'.format(
+    mouse.position))
+
+# Set pointer position
+mouse.position = (0, 0)
+print('Now we have moved it to {0}'.format(
+    mouse.position))
+
+mouse.move(750, 250)
+mouse.position = (750, 250)
+
+print('Now we have moved it to {0}'.format(
+    mouse.position))
+mouse.move(750, 250)
+mouse.position = (750, 250)
+print('Now we have moved it to {0}'.format(
+    mouse.position))
+mouse.move(750, 250)
+mouse.position = (750, 250)
+print('Now we have moved it to {0}'.format(
+    mouse.position))
+mouse.move(750, 250)
+mouse.position = (750, 250)

@@ -13,6 +13,7 @@ def calcDistanceBetweenFingers(lm1, lm2):
     res = (((lm2[0] - lm1[0]) ** 2) + ((lm2[1] - lm1[1]) ** 2)) ** 0.5
     return res
 
+
 class handDetector():
     """
     Hand detector class
@@ -158,7 +159,8 @@ class handDetector():
             for i in range(len(self.distanceBetweenFingersOpenHand)):
                 self.distanceBetweenFingersOpenHand[i] = self.distanceBetweenFingersOpenHand[i] / count
                 print(self.distanceBetweenFingersOpenHand[i])
-    def initHandSize(self,StatState = 0):
+
+    def initHandSize(self, StatState=0):
         """
         Initializes the hand size in order to get a relative size for future calculations
         The user needs to place his hand in the middle of the screen for 5 second, after that the system will calc the
@@ -268,6 +270,7 @@ class handDetector():
 
     def getdistanceBetweenFingersOpenHand(self):
         return self.distanceBetweenFingersOpenHand
+
 
 # test!
 def main():
