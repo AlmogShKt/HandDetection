@@ -1,4 +1,4 @@
-from HandDetectionModule import handDetector, calcDistanceBetweenFingers
+from HandDetectionModule import HandDetector, calcDistanceBetweenFingers
 from HandFunctions import Features
 import cv2
 import time
@@ -36,25 +36,37 @@ def main():
     # Receive video from camera 0
     cap = cv2.VideoCapture(0)
 
-    detector = handDetector()
+    detector = HandDetector()
     allFeature = Features(detector)
 
     detector.initHandSize()
     print("Done init, starting app...")
     while True:
         success, img = cap.read()
+        #Draw the functions menu
+        img = drawMenu(cv2.flip(img,1), False)
 
-        img = drawMenu(cv2.flip(img, 1), True)
-
+        #draw hands landmarks on the img
         img = detector.findHands(img)
+        #return the lmList
         lmList = detector.getLendmarkPos(img)
-        allFeature.setLmList(lmList)
+        #Define the lmList in the class
+        allFeature.setVars(lmList,img)
 
-        if lmList:
-            if allFeature.handIsClose():
-                cv2.rectangle(img, (590, 10), (830, 100), (194, 214, 214), cv2.FILLED)
-                cv2.putText(img,"Hand Is Close",(600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-            allFeature.moveMouse()
+        #Only if hand is detected:
+        try:
+            cv2.circle(img, (0, 0), 10, (154, 239, 192), cv2.FILLED)
+
+            if lmList:
+                if allFeature.handIsClose():
+                    cv2.rectangle(img, (590, 10), (830, 100), (194, 214, 214), cv2.FILLED)
+                    cv2.putText(img,"Hand Is Close",(600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+                img = allFeature.dragRectangles()
+            else:
+                cv2.putText(img, "Hand is not detected", (600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+        except Exception as e:  # work on python 3.x
+            print('Failed app ' + str(e))
+
 
         # Calc the fps
         cur_time = time.time()
@@ -64,8 +76,10 @@ def main():
         # Show FPS on video
         cv2.putText(img, f"FPS: {str(int(fps))}", (1750, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
 
+        #img= cv2.resize(img,(1512,1080))
+        cv2.resizeWindow("Hey",1512,982)
         # Show window with img
-        cv2.imshow("Hey ;)", img)
+        cv2.imshow("Hey", img)
         cv2.waitKey(1)
 
 

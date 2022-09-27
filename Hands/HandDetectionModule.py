@@ -1,8 +1,10 @@
-import cv2
-import mediapipe as mp
 import time
 
+import cv2
+import mediapipe as mp
 
+
+# Static function:
 def calcDistanceBetweenFingers(lm1, lm2):
     """
     Calc the distance between 2 given landmarks
@@ -14,7 +16,7 @@ def calcDistanceBetweenFingers(lm1, lm2):
     return res
 
 
-class handDetector():
+class HandDetector:
     """
     Hand detector class
     """
@@ -44,6 +46,9 @@ class handDetector():
 
         self.mpDraw = mp.solutions.drawing_utils
 
+        # the list with all the landmarks
+        self.lmList = []
+
     def findHands(self, img, draw=True):
         """
         Finding the hands
@@ -71,9 +76,6 @@ class handDetector():
         :param draw: True by default, will add a circle on HCP
         :return: the array with all the 20 landmarks
         """
-
-        # the list with all the landmarks
-        self.lmList = []
 
         # Only if there is detection
         if self.result.multi_hand_landmarks:
@@ -262,11 +264,14 @@ class handDetector():
                     flag = False
                     print(self.distanceBetweenFingersOpenHand)
                     return True
+            elif currentState == 9:
+                return
             try:
                 cv2.imshow(initStates[currentState], img)
                 cv2.waitKey(1)
             except:
                 print(initStates[currentState])
+                print("Failed on initHands")
 
     def getdistanceBetweenFingersOpenHand(self):
         return self.distanceBetweenFingersOpenHand
@@ -274,7 +279,7 @@ class handDetector():
 
 # test!
 def main():
-    D = handDetector()
+    D = HandDetector()
 
     D.initHandSize()
 
