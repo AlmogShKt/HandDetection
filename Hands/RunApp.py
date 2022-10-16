@@ -29,6 +29,8 @@ def drawMenu(img, draw):
     return img
 
 def main():
+    #Test with Tamir
+
     # previous an current time
     pre_time = 0
     cur_time = 0
