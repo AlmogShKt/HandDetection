@@ -46,8 +46,7 @@ class HandDetector:
 
         self.mpDraw = mp.solutions.drawing_utils
 
-        # the list with all the landmarks
-        self.lmList = []
+
 
     def findHands(self, img, draw=True):
         """
@@ -76,6 +75,9 @@ class HandDetector:
         :param draw: True by default, will add a circle on HCP
         :return: the array with all the 20 landmarks
         """
+        newList = []
+        # the list with all the landmarks
+        self.lmList = []
 
         # Only if there is detection
         if self.result.multi_hand_landmarks:
@@ -89,15 +91,19 @@ class HandDetector:
                 # Convert lmX, lmY tp pixel location
                 h, w, c = img.shape
                 cx, cy = int(lmX * w), int(lmY * h)
+
                 # print(f"ID:{id}, {cx, cy}")
                 self.lmList.append([id, cx, cy])
+
+                newList.append([id, cx, cy])
+                print(newList)
 
                 if draw and len(self.lmList) > 9:
                     # Only when there is at least 9 landmarks
                     # Calc the center of the hand
                     self.calcHCP()
                     # Draw the Circle on the center of the hand
-                    cv2.circle(img, (self.handCenterPos), 10, (154, 239, 192), cv2.FILLED)
+                    cv2.circle(img, self.handCenterPos, 10, (154, 239, 192), cv2.FILLED)
             self.setFingers()
             return self.lmList
 

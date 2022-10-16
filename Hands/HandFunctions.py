@@ -101,9 +101,11 @@ class Features:
 
     def setImg(self, img):
         self.img = img
+        return
 
     def setLmList(self, lmList):
         self.lmList = lmList
+        return
 
     def handIsClose(self):
         self.setFingers()

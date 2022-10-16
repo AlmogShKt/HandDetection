@@ -39,7 +39,7 @@ def main():
     detector = HandDetector()
     allFeature = Features(detector)
 
-    detector.initHandSize()
+    #detector.initHandSize()
     print("Done init, starting app...")
     while True:
         success, img = cap.read()
@@ -55,8 +55,6 @@ def main():
 
         #Only if hand is detected:
         try:
-            cv2.circle(img, (0, 0), 10, (154, 239, 192), cv2.FILLED)
-
             if lmList:
                 if allFeature.handIsClose():
                     cv2.rectangle(img, (590, 10), (830, 100), (194, 214, 214), cv2.FILLED)
