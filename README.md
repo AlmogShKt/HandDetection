@@ -33,11 +33,11 @@ pip install mouse
 ## Features
 * First inizialize your hand size:
 
-![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-Init_AdobeExpress.gif)
+  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-Init_AdobeExpress.gif)
 
 * Detect close hand
 
-![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-IsCloseHand.gif)
+  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-IsCloseHand.gif)
 
 
 * Control your mouse using the hand!
@@ -48,7 +48,7 @@ pip install mouse
 
 * Draw with your hand!
 
-![DragRectangel](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-DragRec_AdobeExpress.gif)
+  - ![DragRectangel](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-DragRec_AdobeExpress.gif)
 
 
 
