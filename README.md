@@ -43,6 +43,7 @@ pip install mouse
 * Control your mouse using the hand!
 
   - Use your hand to control the mouse posotion, close the hand to click and open the hand to relase
+  - ![MoveMouse](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-MoveMouse.gif)
   
 
 * Draw with your hand!
