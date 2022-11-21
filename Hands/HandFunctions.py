@@ -130,7 +130,7 @@ class Features:
 
     def printDisForTest(self, lmList):
         self.setFingers(lmList)
-        print(self.detector.distanceBetweenFingers(self.f4, self.f8))
+        #print(self.detector.distanceBetweenFingers(self.f4, self.f8))
 
     def getScreenInfo(self):
         return self.screenInfo
@@ -184,7 +184,7 @@ class Features:
 
         if self.fingersAreClose():
             mouse.press(Button.left)
-            print((mouseX, mouseY))
+            #print((mouseX, mouseY))
             return (mouseX, mouseY)
         else:
 

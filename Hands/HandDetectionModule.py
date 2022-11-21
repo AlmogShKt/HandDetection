@@ -96,7 +96,7 @@ class HandDetector:
                 self.lmList.append([id, cx, cy])
 
                 newList.append([id, cx, cy])
-                print(newList)
+                #print(newList)
 
                 if draw and len(self.lmList) > 9:
                     # Only when there is at least 9 landmarks
@@ -166,7 +166,7 @@ class HandDetector:
         if count == 5:
             for i in range(len(self.distanceBetweenFingersOpenHand)):
                 self.distanceBetweenFingersOpenHand[i] = self.distanceBetweenFingersOpenHand[i] / count
-                print(self.distanceBetweenFingersOpenHand[i])
+                #print(self.distanceBetweenFingersOpenHand[i])
 
     def initHandSize(self, StatState=0):
         """
@@ -268,7 +268,6 @@ class HandDetector:
                     startTime = time.time()
                 if holdFor5Sec == 0:
                     flag = False
-                    print(self.distanceBetweenFingersOpenHand)
                     return True
             elif currentState == 9:
                 return

@@ -35,7 +35,8 @@ pip install mouse
 * Control your mouse using the hand!
 
   - Use your hand to contril the mouse posotion, close the hand to click and opem the hand to relase
-  ![screenshot](https://raw.githubusercontent.com/amitmerchant1990/electron-markdownify/master/app/img/markdownify.gif)
+  - 
+  ![Demo1](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-Init_AdobeExpress.gif)
   
 
 * Draw with your hand!
