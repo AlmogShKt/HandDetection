@@ -264,19 +264,20 @@ class HandDetector:
             # Done!
             elif currentState == 2:
                 wait_key = 0
-                img = cv2.imread("/Users/almogshtaigmann/PycharmProjects/HandDetection/Hands/green-check-mark-.jpeg")
+                print(holdFor5Sec)
+                img = cv2.imread("/Users/almogshtaigmann/PycharmProjects/HandDetection/Hands/All_Set_img.png")
                 # Show the image for 5 sec the end the init' process
-                if time.time() - startTime > 1:
-                    holdFor5Sec -= 1
-                    startTime = time.time()
-                if holdFor5Sec == 0:
-                    flag = False
-                    return True
             elif currentState == 9:
                 return
             try:
+                print("h")
                 cv2.imshow(initStates[currentState], img)
+
                 cv2.waitKey(wait_key)
+                if wait_key == 0:
+                    cv2.destroyAllWindows()
+                    break
+
             except:
                 print(initStates[currentState])
                 print("Failed on initHands")

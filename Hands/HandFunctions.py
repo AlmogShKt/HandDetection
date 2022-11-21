@@ -194,13 +194,13 @@ class Features:
             mouse.release(Button.left)
             # return (mouseX,mouseY)
 
-    def freeDraw(self,i, paint_color='black', thickness='small'):
+    def freeDraw(self, i, paint_color='black', thickness='small'):
         mouseX = self.f8[0]
         mouseY = self.f8[1]
 
         self.board.set_drawing_color(paint_color)
         self.board.set_cursor_thickness(thickness)
-        self.board.draw(i,mouseX,mouseY)
+        self.board.draw(i, mouseX, mouseY)
         return self.board.getBoard()
 
 
@@ -239,13 +239,15 @@ class Board:
             # in case that the user insret worng color name - def value
             self.cur_drawing_color = self.drawing_colors['black']
 
-    def loadBoard(self):
+    def load_board(self):
         self.board = cv2.imread('/Users/almogshtaigmann/PycharmProjects/HandDetection/Hands/runningBoard.png')
 
-    def draw(self,i, x, y):
+    def draw(self, i=0, x=0, y=0, mouse_mode=False):
 
-        map_X, map_Y = self.setCursorPosotion(x,y)
+        #Get the relative position for x,y
+        map_X, map_Y = self.setCursorPosotion(x, y, mouse_mode)
 
+        #thickness by def' is 50 pixels
         self.board[map_Y:map_Y + self.cur_cursor_thickness,
         map_X:map_X + self.cur_cursor_thickness] = self.cur_drawing_color
 
@@ -272,9 +274,9 @@ class Board:
         return cursor_position
 
 
-
 def main():
-    pass
+    b = Board()
+    b.draw(mouse_mode=True)
     # img size (2484, 3630, 3)
     # left screen size 1500 #916
 
