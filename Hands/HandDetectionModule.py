@@ -189,6 +189,8 @@ class HandDetector:
             """
             return (p_x - center_x) ** 2 + (p_y - center_y) ** 2 < R ** 2
 
+        wait_key = 1
+
         # All the sates in the process:
         # Waiting for user to place and hold the hand in the middle of the screen for 5 second
         initStates = {0: "Waiting",
@@ -261,6 +263,7 @@ class HandDetector:
                     currentState += 1
             # Done!
             elif currentState == 2:
+                wait_key = 0
                 img = cv2.imread("/Users/almogshtaigmann/PycharmProjects/HandDetection/Hands/green-check-mark-.jpeg")
                 # Show the image for 5 sec the end the init' process
                 if time.time() - startTime > 1:
@@ -273,7 +276,7 @@ class HandDetector:
                 return
             try:
                 cv2.imshow(initStates[currentState], img)
-                cv2.waitKey(1)
+                cv2.waitKey(wait_key)
             except:
                 print(initStates[currentState])
                 print("Failed on initHands")

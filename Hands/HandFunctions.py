@@ -1,10 +1,11 @@
-import time
 import cv2
-from HandDetectionModule import HandDetector, calcDistanceBetweenFingers
 from pynput.mouse import Button, Controller
 from screeninfo import get_monitors
 
-#Static function:
+from HandDetectionModule import calcDistanceBetweenFingers
+
+
+# Static function:
 def pointInRect(lm, rectLU, rectRD):
     """
     Check if point is within a rectangle
@@ -36,6 +37,8 @@ class Features:
 
         """
         self.detector = detector
+
+        self.board = Board()
 
         # The distance between the top of each finger
         # place 0: dis between lm4-lm8
@@ -130,7 +133,7 @@ class Features:
 
     def printDisForTest(self, lmList):
         self.setFingers(lmList)
-        #print(self.detector.distanceBetweenFingers(self.f4, self.f8))
+        # print(self.detector.distanceBetweenFingers(self.f4, self.f8))
 
     def getScreenInfo(self):
         return self.screenInfo
@@ -157,7 +160,7 @@ class Features:
 
         # Check if the lm is within the rectangle
         inRect = pointInRect((int(self.f8[0]), int(self.f8[1])), (self.rectX, self.rectY),
-                                  (self.rectX + 250, self.rectY + 250))
+                             (self.rectX + 250, self.rectY + 250))
 
         # only if the 'finger are close' and the lm is within the rectangle - change the positing of the rectangle
         # The lm is the center of the rectangle new position
@@ -166,7 +169,7 @@ class Features:
             # Xcenter(lm8[0]) = (x1 + x2(x1+250))/2
             # Ycenter(lm8[1]) = (y1 + y2(x1+250))/2
 
-            #Set the right up corner of the rectangle (lm 8 is the center of the rectangle)
+            # Set the right up corner of the rectangle (lm 8 is the center of the rectangle)
             self.rectX = int((2 * (int(self.f8[0])) - 250) / 2)
             self.rectY = int((2 * (int(self.f8[1])) - 250) / 2)
 
@@ -184,9 +187,97 @@ class Features:
 
         if self.fingersAreClose():
             mouse.press(Button.left)
-            #print((mouseX, mouseY))
+            # print((mouseX, mouseY))
             return (mouseX, mouseY)
         else:
 
             mouse.release(Button.left)
             # return (mouseX,mouseY)
+
+    def freeDraw(self,i, paint_color='black', thickness='small'):
+        mouseX = self.f8[0]
+        mouseY = self.f8[1]
+
+        self.board.set_drawing_color(paint_color)
+        self.board.set_cursor_thickness(thickness)
+        self.board.draw(i,mouseX,mouseY)
+        return self.board.getBoard()
+
+
+class Board:
+    def __init__(self):
+        self.board = cv2.imread("/Users/almogshtaigmann/PycharmProjects/HandDetection/photos/CleanBoard.png")
+        print(self.board.shape)
+        self.drawing_colors = {
+            'black': (0, 0, 0),
+            'green': (0, 255, 0),
+            'red': (0, 0, 255),
+            'blue': (255, 0, 0),
+            'pink': (213, 86, 245)
+        }
+
+        self.cursors_thickness = {
+            'small': 30,
+            'medium': 50,
+            'large': 75
+        }
+        self.cur_cursor_thickness = self.cursors_thickness['small']
+        self.cur_drawing_color = (0, 0, 0)  # by def its black
+
+    def set_cursor_thickness(self, thickness):
+        thickness = thickness.lower()
+        try:
+            self.cur_cursor_thickness = self.cursors_thickness['aa']
+        except KeyError:
+            self.cur_cursor_thickness = self.cursors_thickness['small']
+
+    def set_drawing_color(self, color):
+        color = color.lower()
+        try:
+            self.cur_drawing_color = self.drawing_colors[color]
+        except KeyError:
+            # in case that the user insret worng color name - def value
+            self.cur_drawing_color = self.drawing_colors['black']
+
+    def loadBoard(self):
+        self.board = cv2.imread('/Users/almogshtaigmann/PycharmProjects/HandDetection/Hands/runningBoard.png')
+
+    def draw(self,i, x, y):
+
+        map_X, map_Y = self.setCursorPosotion(x,y)
+
+        self.board[map_Y:map_Y + self.cur_cursor_thickness,
+        map_X:map_X + self.cur_cursor_thickness] = self.cur_drawing_color
+
+    def getBoard(self):
+        return self.board
+
+    def setCursorPosotion(self, x=0, y=0, mouse_mode=False):
+        if mouse_mode:
+            mos = Controller()
+
+            x = mos.position[0]
+            y = mos.position[1]
+
+        map_X = (x / 1500) * 3630
+        if map_X > 3630:
+            map_X = 3630
+
+        map_Y = (y / 920) * 2484
+        if map_Y > 2484:
+            map_Y = 2484
+
+        cursor_position = (int(map_X), int(map_Y))
+
+        return cursor_position
+
+
+
+def main():
+    pass
+    # img size (2484, 3630, 3)
+    # left screen size 1500 #916
+
+
+if __name__ == "__main__":
+    main()
