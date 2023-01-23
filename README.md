@@ -68,5 +68,3 @@ This software uses the following open source packages:
 
 > GitHub [@AlmogShkt](https://github.com/AlmogShKt) &nbsp;&middot;&nbsp;
 > Linkedin [@Almog Shtaigmann](https://www.linkedin.com/in/almog-shtaigmann/)
-
-
