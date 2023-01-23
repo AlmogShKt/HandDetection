@@ -31,15 +31,26 @@ pip install mouse
 
 
 ## Features
+* First inizialize your hand size:
+
+  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-Init_AdobeExpress.gif)
+
+* Detect close hand
+
+  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-IsCloseHand.gif)
+
 
 * Control your mouse using the hand!
 
-  - Use your hand to contril the mouse posotion, close the hand to click and opem the hand to relase
-  - 
-  ![Demo1](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-Init_AdobeExpress.gif)
+  - Use your hand to control the mouse posotion, close the hand to click and open the hand to relase
+  - ![MoveMouse](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-MoveMouse.gif)
   
 
 * Draw with your hand!
+
+  - ![DragRectangel](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-DragRec_AdobeExpress.gif)
+
+
 
 
 ## Download
@@ -50,7 +61,8 @@ You can
 
 This software uses the following open source packages:
 
-- [Electron](http://electron.atom.io/)
+- [OpeCV](https://opencv.org/)
+- [MediaPipe](https://google.github.io/mediapipe/)
 
 ## Related
 
