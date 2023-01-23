@@ -41,7 +41,7 @@ def main():
     detector = HandDetector()
     allFeature = Features(detector)
 
-    #detector.initHandSize()
+    #detector.initHandSize(2)
     print("Done init, starting app...")
     i=0
     while True:
@@ -62,10 +62,10 @@ def main():
                 if allFeature.handIsClose():
                     cv2.rectangle(img, (590, 10), (830, 100), (194, 214, 214), cv2.FILLED)
                     cv2.putText(img, "Hand Is Close",(600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-                #img = allFeature.dragRectangles()
+                img = allFeature.dragRectangles()
                 i += 1
-                board = allFeature.freeDraw(i,paint_color='pink', thickness='large')
-                cv2.imshow('board',board)
+                #board = allFeature.freeDraw(i,paint_color='pink', thickness='large')
+                #cv2.imshow('board',board)
 
             else:
                 cv2.putText(img, "Hand is not detected", (600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
@@ -82,7 +82,7 @@ def main():
         cv2.putText(img, f"FPS: {str(int(fps))}", (1750, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
 
         # Show window with img
-        #cv2.imshow("Hey", img)
+        cv2.imshow("Hey", img)
         cv2.waitKey(1)
 
 
