@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/amitmerchant1990/electron-markdownify/master/app/img/markdownify.png" alt="Markdownify" width="200"></a>
+  <img src="https://github.com/AlmogShKt/HandDetection/blob/master/photos/HandDetectionLogo.png" alt="handDetection" width="200"></a>
   <br>
   Hand Detector
   <br>
