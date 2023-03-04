@@ -54,17 +54,17 @@ def main():
         #return the landmark_list
         landmark_list = detector.get_landmark_position(img)
         #Define the landmark_list in the class
-        allFeature.setVars(landmark_list,img)
+        allFeature.set_variables(landmark_list,img)
 
         #Only if hand is detected:
         try:
             if landmark_list:
-                if allFeature.handIsClose():
+                if allFeature.hand_is_close():
                     cv2.rectangle(img, (590, 10), (830, 100), (194, 214, 214), cv2.FILLED)
                     cv2.putText(img, "Hand Is Close",(600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-                img = allFeature.dragRectangles()
+                img = allFeature.drag_rectangle()
                 i += 1
-                #board = allFeature.freeDraw(i,paint_color='pink', thickness='large')
+                #board = allFeature.free_draw(i,paint_color='pink', thickness='large')
                 #cv2.imshow('board',board)
 
             else:

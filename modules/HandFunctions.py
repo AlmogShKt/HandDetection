@@ -6,23 +6,30 @@ from HandDetectionModule import calc_distance_between_fingers
 
 
 # Static function:
-def pointInRect(lm, rectLU, rectRD):
+def get_primary_screen_info():
+    for monitor in get_monitors():
+        if monitor.is_primary:
+            primary_screen_info = monitor
+    return primary_screen_info
+
+
+def point_in_rectangle(lm, rect_left_up_point, rect_right_down_point):
     """
     Check if point is within a rectangle
     :param lm: the point (landmark)
-    :param rectLU: Left Up point of the rectangle
-    :param rectRD:  Right Down point of the rectangle
+    :param rect_left_up_point: Left Up point of the rectangle
+    :param rect_right_down_point:  Right Down point of the rectangle
     :return: True if the point is within the rectangle otherwise False
     """
-    x1, y1 = rectLU[0], rectLU[1]
-    w = abs(rectRD[0] - rectLU[0])
-    h = abs(rectRD[1] - rectLU[1])
+    x1, y1 = rect_left_up_point[0], rect_left_up_point[1]
+    w = abs(rect_right_down_point[0] - rect_left_up_point[0])
+    h = abs(rect_right_down_point[1] - rect_left_up_point[1])
 
     x2, y2 = x1 + w, y1 + h
     x, y = lm[0], lm[1]
 
-    if (x1 < x and x < x2):
-        if (y1 < y and y < y2):
+    if x1 < x < x2:
+        if y1 < y < y2:
             return True
     return False
 
@@ -37,7 +44,6 @@ class Features:
 
         """
         self.detector = detector
-
         self.board = Board()
 
         # The distance between the top of each finger
@@ -46,28 +52,26 @@ class Features:
         # place 2: dis between lm12-l16
         # place 3: dis between lm16-lm20
         # place 4: dis between lm20-lm4
-        self.relativeScaleForCloseHand = [0, 0, 0, 0, 0]
+        self.relative_scale_for_close_hand = [0, 0, 0, 0, 0]
         self.img = img
 
-        # Varibles for dedicated functions:
+        # Variables for dedicated functions:
         # For frag rectangles:
         # First Values:
-        self.rectX = 750
-        self.rectY = 500
+        self.rectangle_x_position = 750
+        self.rectangle_y_position = 500
 
-        for m in get_monitors():
-            if m.is_primary:
-                self.screenInfo = m
+        self.screen_info = get_primary_screen_info()
 
-    def setVars(self, landmark_list, img):
+    def set_variables(self, landmark_list, img):
         """
         Sets all the class variables
         :param landmark_list:
         :param img:
         :return:
         """
-        self.setlandmark_list(landmark_list)
-        self.setImg(img)
+        self.set_landmark_list(landmark_list)
+        self.set_img(img)
 
     def set_fingers(self, ):
         try:
@@ -89,7 +93,7 @@ class Features:
             self.f20 = self.landmark_list[20][1:3]
 
             if not self.detector.get_distance_between_fingers_open_hand()[0] == 0:
-                self.relativeScaleForCloseHand = [
+                self.relative_scale_for_close_hand = [
                     self.detector.get_distance_between_fingers_open_hand()[0] * 0.5,
                     self.detector.get_distance_between_fingers_open_hand()[1] * 0.5,
                     self.detector.get_distance_between_fingers_open_hand()[2] * 0.5,
@@ -98,24 +102,25 @@ class Features:
                 ]
             else:
                 # for tests..
-                self.relativeScaleForCloseHand = [298.2, 101.4, 83.6, 121.0, 441.4]
-        except:
-            print("Failed on setFinger")
+                self.relative_scale_for_close_hand = [298.2, 101.4, 83.6, 121.0, 441.4]
+        except Exception as err:
+            print(f"Failed on setFinger - {err}")
 
-    def setImg(self, img):
+    def set_img(self, img):
         self.img = img
         return
 
-    def setlandmark_list(self, landmark_list):
+    def set_landmark_list(self, landmark_list):
         self.landmark_list = landmark_list
         return
 
-    def handIsClose(self):
+    def hand_is_close(self):
+        """
+                Detect if the hands is close 
+                :return: True if the hand is close
+                """
         self.set_fingers()
-        """
-        Detect if the hands is close 
-        :return: True if the hand is close
-        """
+
         if self.landmark_list:
             if self.f8[1] > self.f5[1] and self.f12[1] > self.f9[1] and self.f16[1] > self.f13[1] and self.f20[1] > \
                     self.f17[1]:
@@ -124,30 +129,30 @@ class Features:
                 return False
 
             # Another but less reliable way to check if the hand is close
-            # if calc_distance_between_fingers(self.f4, self.f8) < self.relativeScaleForCloseHand[0]+20 \
-            #         and calc_distance_between_fingers(self.f8,self.f12) < self.relativeScaleForCloseHand[1] \
-            #         and calc_distance_between_fingers(self.f12, self.f16) < self.relativeScaleForCloseHand[2] \
-            #         and calc_distance_between_fingers(self.f16,self.f20) < self.relativeScaleForCloseHand[3] \
-            #         and calc_distance_between_fingers(self.f4, self.f20) < self.relativeScaleForCloseHand[4]:
+            # if calc_distance_between_fingers(self.f4, self.f8) < self.relative_scale_for_close_hand[0]+20 \
+            #         and calc_distance_between_fingers(self.f8,self.f12) < self.relative_scale_for_close_hand[1] \
+            #         and calc_distance_between_fingers(self.f12, self.f16) < self.relative_scale_for_close_hand[2] \
+            #         and calc_distance_between_fingers(self.f16,self.f20) < self.relative_scale_for_close_hand[3] \
+            #         and calc_distance_between_fingers(self.f4, self.f20) < self.relative_scale_for_close_hand[4]:
             #     return True
 
-    def printDisForTest(self, landmark_list):
-        self.set_fingers(landmark_list)
+    def print_dis_for_test(self):
+        self.set_fingers()
         # print(self.detector.distanceBetweenFingers(self.f4, self.f8))
 
-    def getScreenInfo(self):
-        return self.screenInfo
+    def get_screen_info(self):
+        return self.screen_info
 
-    def fingersAreClose(self):
+    def fingers_are_close(self):
         """
         Check if lm8 and lm12 are close -> the finger are "close"
         :return: True if the finger are close otherwise False
         """
         dis = calc_distance_between_fingers(self.f8, self.f12)
         # Only if the hand is NOT close AND the distance is smaller the the relative size
-        return dis < self.relativeScaleForCloseHand[1] and not self.handIsClose()
+        return dis < self.relative_scale_for_close_hand[1] and not self.hand_is_close()
 
-    def dragRectangles(self):
+    def drag_rectangle(self):
         """
         Function 1
         Drag a rectangle with your fingers, Create the "Peace" sign with your fingers,
@@ -156,57 +161,58 @@ class Features:
         :return: the img with the rectangle
         """
         # Draw the rectangle
-        cv2.rectangle(self.img, (self.rectX, self.rectY), (self.rectX + 250, self.rectY + 250), (194, 0, 214), 2)
+        cv2.rectangle(self.img, (self.rectangle_x_position, self.rectangle_y_position),
+                      (self.rectangle_x_position + 250, self.rectangle_y_position + 250), (194, 0, 214), 2)
 
         # Check if the lm is within the rectangle
-        inRect = pointInRect((int(self.f8[0]), int(self.f8[1])), (self.rectX, self.rectY),
-                             (self.rectX + 250, self.rectY + 250))
+        is_point_in_rectangle = point_in_rectangle((int(self.f8[0]), int(self.f8[1])),
+                                                   (self.rectangle_x_position, self.rectangle_y_position),
+                                                   (self.rectangle_x_position + 250, self.rectangle_y_position + 250))
 
         # only if the 'finger are close' and the lm is within the rectangle - change the positing of the rectangle
         # The lm is the center of the rectangle new position
-        if self.fingersAreClose() and inRect:
+        if self.fingers_are_close() and is_point_in_rectangle:
             # Original equation :
             # Xcenter(lm8[0]) = (x1 + x2(x1+250))/2
             # Ycenter(lm8[1]) = (y1 + y2(x1+250))/2
 
             # Set the right up corner of the rectangle (lm 8 is the center of the rectangle)
-            self.rectX = int((2 * (int(self.f8[0])) - 250) / 2)
-            self.rectY = int((2 * (int(self.f8[1])) - 250) / 2)
+            self.rectangle_x_position = int((2 * (int(self.f8[0])) - 250) / 2)
+            self.rectangle_y_position = int((2 * (int(self.f8[1])) - 250) / 2)
 
         return self.img
 
-    def moveMouse(self):
-        mouseX = (self.f8[0] / 1920) * self.screenInfo.width
-        mouseY = (self.f8[1] / 1080) * self.screenInfo.height
-        mouseX = int(mouseX)
-        mouseY = int(mouseY)
+    def move_mouse(self):
+        mouse_x_position = (self.f8[0] / 1920) * self.screen_info.width
+        mouse_y_position = (self.f8[1] / 1080) * self.screen_info.height
+        mouse_x_position = int(mouse_x_position)
+        mouse_y_position = int(mouse_y_position)
 
         mouse = Controller()
-        mouse.move(mouseX, mouseY)
-        mouse.position = (mouseX, mouseY)
+        mouse.move(mouse_x_position, mouse_y_position)
+        mouse.position = (mouse_x_position, mouse_y_position)
 
-        if self.fingersAreClose():
+        if self.fingers_are_close():
             mouse.press(Button.left)
-            # print((mouseX, mouseY))
-            return (mouseX, mouseY)
+            # print((mouse_x_position, mouse_y_position))
+            return (mouse_x_position, mouse_y_position)
         else:
-
             mouse.release(Button.left)
-            # return (mouseX,mouseY)
+            # return (mouse_x_position,mouse_y_position)
 
-    def freeDraw(self, i, paint_color='black', thickness='small'):
-        mouseX = self.f8[0]
-        mouseY = self.f8[1]
+    def free_draw(self, i, paint_color='black', thickness='small'):
+        mouse_x_position = self.f8[0]
+        mouse_y_position = self.f8[1]
 
         self.board.set_drawing_color(paint_color)
         self.board.set_cursor_thickness(thickness)
-        self.board.draw(i, mouseX, mouseY)
-        return self.board.getBoard()
+        self.board.draw(i, mouse_x_position, mouse_y_position)
+        return self.board.get_board()
 
 
 class Board:
     def __init__(self):
-        self.board = cv2.imread("/Users/almogshtaigmann/PycharmProjects/HandDetection/photos/CleanBoard.png")
+        self.board = cv2.imread("photos/CleanBoard.png")
         print(self.board.shape)
         self.drawing_colors = {
             'black': (0, 0, 0),
@@ -236,7 +242,7 @@ class Board:
         try:
             self.cur_drawing_color = self.drawing_colors[color]
         except KeyError:
-            # in case that the user insret worng color name - def value
+            # in case that the user insert wrong color name - def value
             self.cur_drawing_color = self.drawing_colors['black']
 
     def load_board(self):
@@ -244,28 +250,31 @@ class Board:
 
     def draw(self, i=0, x=0, y=0, mouse_mode=False):
 
-        #Get the relative position for x,y
-        map_X, map_Y = self.setCursorPosotion(x, y, mouse_mode)
+        # Get the relative position for x,y
+        map_X, map_Y = self.set_cursor_position(x, y, mouse_mode)
 
-        #thickness by def' is 50 pixels
+        # thickness by def' is 50 pixels
         self.board[map_Y:map_Y + self.cur_cursor_thickness,
         map_X:map_X + self.cur_cursor_thickness] = self.cur_drawing_color
 
-    def getBoard(self):
+    def get_board(self):
         return self.board
 
-    def setCursorPosotion(self, x=0, y=0, mouse_mode=False):
+    def set_cursor_position(self, x=0, y=0, mouse_mode=False):
         if mouse_mode:
-            mos = Controller()
+            mouse = Controller()
 
-            x = mos.position[0]
-            y = mos.position[1]
+            x = mouse.position[0]
+            y = mouse.position[1]
+        screen_width = get_primary_screen_info().width
+        screen_height = get_primary_screen_info().height
 
-        map_X = (x / 1500) * 3630
+        #make sure that cursor is within the screen
+        map_X = (x / (screen_width-20)) * 3630
         if map_X > 3630:
             map_X = 3630
 
-        map_Y = (y / 920) * 2484
+        map_Y = (y / (screen_height-50)) * 2484
         if map_Y > 2484:
             map_Y = 2484
 
