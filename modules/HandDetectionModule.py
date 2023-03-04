@@ -2,6 +2,9 @@ import time
 import cv2
 import mediapipe as mp
 
+import os
+from dotenv import load_dotenv
+
 
 # Static function:
 def calc_distance_between_fingers(lm1, lm2):
@@ -32,6 +35,9 @@ class HandDetector:
                  min_tracking_confidence: Minimum confidence value ([0.0, 1.0]) for the
                    hand landmarks to be considered tracked successfully. See details in
                """
+        load_dotenv()
+        self.ROOT_PATH = os.getenv('ROOT_DIRECTORY')
+
         self.distance_between_fingers_open_hand = [0, 0, 0, 0, 0]
         self.mode = mode
         self.max_hands = max_hands
@@ -229,6 +235,7 @@ class HandDetector:
                     cv2.putText(img, f"Hold for more {seconds_for_init} second ", (550, 300), cv2.FONT_HERSHEY_SIMPLEX,
                                 2,
                                 (255, 0, 0), 2)
+                    cv2.rectangle(img, (1100, 650), (1350, 500), (255, 0, 0), )
                     # Only if the HCP in in the middle of the screen and 1 sec passed - count down
                     if (is_point_in_circle(1100, 650, 100, self.get_hand_center_position()[0] + 220,
                                            self.get_hand_center_position()[1]) and (
@@ -256,7 +263,8 @@ class HandDetector:
             elif current_state == 2:
                 wait_key = 0
                 print(hold_for_seconds)
-                img = cv2.imread("photos/All_Set_img.png")
+                path_all_set = fr'{self.ROOT_PATH}photos/All_Set_img.png'
+                img = cv2.imread(path_all_set)
                 # Show the image for 5 sec the end the init' process
             elif current_state == 9:
                 return

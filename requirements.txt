@@ -4,3 +4,4 @@ matplotlib
 mouse
 screeninfo
 pynput
+python-dotenv

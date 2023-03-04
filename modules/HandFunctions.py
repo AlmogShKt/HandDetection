@@ -8,6 +8,7 @@ from BoardFunctions import Board
 
 # Static function:
 def get_primary_screen_info():
+    primary_screen_info = ""
     for monitor in get_monitors():
         if monitor.is_primary:
             primary_screen_info = monitor

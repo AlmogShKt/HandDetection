@@ -1,12 +1,27 @@
 import cv2
 from pynput.mouse import Button, Controller
-from HandFunctions import get_primary_screen_info
+from screeninfo import get_monitors
+
+import os
+from dotenv import load_dotenv
+
+
+# Static function:
+def get_primary_screen_info():
+    primary_screen_info = ""
+    for monitor in get_monitors():
+        if monitor.is_primary:
+            primary_screen_info = monitor
+    return primary_screen_info
 
 
 class Board:
     def __init__(self):
-        self.board = cv2.imread("photos/CleanBoard.png")
-        print(self.board.shape)
+        load_dotenv()
+        self.ROOT_PATH = os.getenv('ROOT_DIRECTORY')
+        self.clear_board_path = fr'{self.ROOT_PATH}photos/CleanBoard.png'
+        self.board = cv2.imread(self.clear_board_path)
+
         self.drawing_colors = {
             'black': (0, 0, 0),
             'green': (0, 255, 0),
@@ -39,7 +54,7 @@ class Board:
             self.cur_drawing_color = self.drawing_colors['black']
 
     def load_board(self):
-        self.board = cv2.imread('photos/runningBoard.png')
+        self.board = cv2.imread(f"{self.ROOT_PATH}photos/runningBoard.png")
 
     def draw(self, i=0, x=0, y=0, mouse_mode=False):
 
