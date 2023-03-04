@@ -240,7 +240,7 @@ class Board:
             self.cur_drawing_color = self.drawing_colors['black']
 
     def load_board(self):
-        self.board = cv2.imread('/Users/almogshtaigmann/PycharmProjects/HandDetection/Hands/runningBoard.png')
+        self.board = cv2.imread('/modules/runningBoard.png')
 
     def draw(self, i=0, x=0, y=0, mouse_mode=False):
 

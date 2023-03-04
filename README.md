@@ -26,14 +26,19 @@ pip install matplotlib
 pip install mouse
 ```
 
-> **Note:**
->For opencv version  4.5.5.62  is recommended!
+```bash
+#Or clone the the repo and install from requirements
+pip install -r requirements.txt
+```
+
+> **Note:**  
+> -For opencv version  4.5.5.62  is recommended!
 >
->This environment is for MacOS! (Windows need adjustment).
+> -This environment is for macOS! (Windows need adjustment).
 
 
 ## Features
-* First inizialize your hand size:
+* First initialize your hand size:
 
   - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-Init_AdobeExpress.gif)
 

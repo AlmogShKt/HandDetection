@@ -265,7 +265,7 @@ class HandDetector:
             elif currentState == 2:
                 wait_key = 0
                 print(holdFor5Sec)
-                img = cv2.imread("/Users/almogshtaigmann/PycharmProjects/HandDetection/Hands/All_Set_img.png")
+                img = cv2.imread("/modules/All_Set_img.png")
                 # Show the image for 5 sec the end the init' process
             elif currentState == 9:
                 return
