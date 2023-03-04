@@ -6,8 +6,8 @@ import time
 cap = cv2.VideoCapture(0)
 
 
-mpHands = mp.solutions.hands
-hands = mpHands.Hands()
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands()
 
 mpPose = mp.solutions.pose
 mpPose.Pose(model_complexity=0)
@@ -42,7 +42,7 @@ while True:
                 fingerL.append((id, (cx, cy)))
                 print(f"ID:{id}, {cx, cy}")
 
-            mpDraw.draw_landmarks(img, handLms,mpHands.HAND_CONNECTIONS)
+            mpDraw.draw_landmarks(img, handLms,mp_hands.HAND_CONNECTIONS)
 
 
 

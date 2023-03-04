@@ -2,7 +2,7 @@ import cv2
 from pynput.mouse import Button, Controller
 from screeninfo import get_monitors
 
-from HandDetectionModule import calcDistanceBetweenFingers
+from HandDetectionModule import calc_distance_between_fingers
 
 
 # Static function:
@@ -59,42 +59,42 @@ class Features:
             if m.is_primary:
                 self.screenInfo = m
 
-    def setVars(self, lmList, img):
+    def setVars(self, landmark_list, img):
         """
         Sets all the class variables
-        :param lmList:
+        :param landmark_list:
         :param img:
         :return:
         """
-        self.setLmList(lmList)
+        self.setlandmark_list(landmark_list)
         self.setImg(img)
 
-    def setFingers(self, ):
+    def set_fingers(self, ):
         try:
-            self.f0 = self.lmList[0][1:3]
-            self.f2 = self.lmList[2][1:3]
-            self.f4 = self.lmList[4][1:3]
-            self.f3 = self.lmList[3][1:3]
-            self.f5 = self.lmList[5][1:3]
-            self.f6 = self.lmList[6][1:3]
-            self.f8 = self.lmList[8][1:3]
-            self.f9 = self.lmList[9][1:3]
-            self.f10 = self.lmList[10][1:3]
-            self.f12 = self.lmList[12][1:3]
-            self.f13 = self.lmList[13][1:3]
-            self.f14 = self.lmList[14][1:3]
-            self.f16 = self.lmList[16][1:3]
-            self.f17 = self.lmList[17][1:3]
-            self.f18 = self.lmList[18][1:3]
-            self.f20 = self.lmList[20][1:3]
+            self.f0 = self.landmark_list[0][1:3]
+            self.f2 = self.landmark_list[2][1:3]
+            self.f4 = self.landmark_list[4][1:3]
+            self.f3 = self.landmark_list[3][1:3]
+            self.f5 = self.landmark_list[5][1:3]
+            self.f6 = self.landmark_list[6][1:3]
+            self.f8 = self.landmark_list[8][1:3]
+            self.f9 = self.landmark_list[9][1:3]
+            self.f10 = self.landmark_list[10][1:3]
+            self.f12 = self.landmark_list[12][1:3]
+            self.f13 = self.landmark_list[13][1:3]
+            self.f14 = self.landmark_list[14][1:3]
+            self.f16 = self.landmark_list[16][1:3]
+            self.f17 = self.landmark_list[17][1:3]
+            self.f18 = self.landmark_list[18][1:3]
+            self.f20 = self.landmark_list[20][1:3]
 
-            if not self.detector.getdistanceBetweenFingersOpenHand()[0] == 0:
+            if not self.detector.get_distance_between_fingers_open_hand()[0] == 0:
                 self.relativeScaleForCloseHand = [
-                    self.detector.getdistanceBetweenFingersOpenHand()[0] * 0.5,
-                    self.detector.getdistanceBetweenFingersOpenHand()[1] * 0.5,
-                    self.detector.getdistanceBetweenFingersOpenHand()[2] * 0.5,
-                    self.detector.getdistanceBetweenFingersOpenHand()[3] * 0.5,
-                    self.detector.getdistanceBetweenFingersOpenHand()[4] * 0.5
+                    self.detector.get_distance_between_fingers_open_hand()[0] * 0.5,
+                    self.detector.get_distance_between_fingers_open_hand()[1] * 0.5,
+                    self.detector.get_distance_between_fingers_open_hand()[2] * 0.5,
+                    self.detector.get_distance_between_fingers_open_hand()[3] * 0.5,
+                    self.detector.get_distance_between_fingers_open_hand()[4] * 0.5
                 ]
             else:
                 # for tests..
@@ -106,17 +106,17 @@ class Features:
         self.img = img
         return
 
-    def setLmList(self, lmList):
-        self.lmList = lmList
+    def setlandmark_list(self, landmark_list):
+        self.landmark_list = landmark_list
         return
 
     def handIsClose(self):
-        self.setFingers()
+        self.set_fingers()
         """
         Detect if the hands is close 
         :return: True if the hand is close
         """
-        if self.lmList:
+        if self.landmark_list:
             if self.f8[1] > self.f5[1] and self.f12[1] > self.f9[1] and self.f16[1] > self.f13[1] and self.f20[1] > \
                     self.f17[1]:
                 return True
@@ -124,15 +124,15 @@ class Features:
                 return False
 
             # Another but less reliable way to check if the hand is close
-            # if calcDistanceBetweenFingers(self.f4, self.f8) < self.relativeScaleForCloseHand[0]+20 \
-            #         and calcDistanceBetweenFingers(self.f8,self.f12) < self.relativeScaleForCloseHand[1] \
-            #         and calcDistanceBetweenFingers(self.f12, self.f16) < self.relativeScaleForCloseHand[2] \
-            #         and calcDistanceBetweenFingers(self.f16,self.f20) < self.relativeScaleForCloseHand[3] \
-            #         and calcDistanceBetweenFingers(self.f4, self.f20) < self.relativeScaleForCloseHand[4]:
+            # if calc_distance_between_fingers(self.f4, self.f8) < self.relativeScaleForCloseHand[0]+20 \
+            #         and calc_distance_between_fingers(self.f8,self.f12) < self.relativeScaleForCloseHand[1] \
+            #         and calc_distance_between_fingers(self.f12, self.f16) < self.relativeScaleForCloseHand[2] \
+            #         and calc_distance_between_fingers(self.f16,self.f20) < self.relativeScaleForCloseHand[3] \
+            #         and calc_distance_between_fingers(self.f4, self.f20) < self.relativeScaleForCloseHand[4]:
             #     return True
 
-    def printDisForTest(self, lmList):
-        self.setFingers(lmList)
+    def printDisForTest(self, landmark_list):
+        self.set_fingers(landmark_list)
         # print(self.detector.distanceBetweenFingers(self.f4, self.f8))
 
     def getScreenInfo(self):
@@ -143,7 +143,7 @@ class Features:
         Check if lm8 and lm12 are close -> the finger are "close"
         :return: True if the finger are close otherwise False
         """
-        dis = calcDistanceBetweenFingers(self.f8, self.f12)
+        dis = calc_distance_between_fingers(self.f8, self.f12)
         # Only if the hand is NOT close AND the distance is smaller the the relative size
         return dis < self.relativeScaleForCloseHand[1] and not self.handIsClose()
 
@@ -240,7 +240,7 @@ class Board:
             self.cur_drawing_color = self.drawing_colors['black']
 
     def load_board(self):
-        self.board = cv2.imread('/modules/runningBoard.png')
+        self.board = cv2.imread('photos/runningBoard.png')
 
     def draw(self, i=0, x=0, y=0, mouse_mode=False):
 

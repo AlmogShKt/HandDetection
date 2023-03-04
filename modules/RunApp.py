@@ -1,4 +1,4 @@
-from HandDetectionModule import HandDetector, calcDistanceBetweenFingers
+from HandDetectionModule import HandDetector, calc_distance_between_fingers
 from HandFunctions import Features
 import cv2
 import time
@@ -41,7 +41,7 @@ def main():
     detector = HandDetector()
     allFeature = Features(detector)
 
-    #detector.initHandSize(2)
+    #detector.initialize_hand_size(2)
     print("Done init, starting app...")
     i=0
     while True:
@@ -50,15 +50,15 @@ def main():
         img = drawMenu(cv2.flip(img,1), False)
 
         #draw hands landmarks on the img
-        img = detector.findHands(img)
-        #return the lmList
-        lmList = detector.getLendmarkPos(img)
-        #Define the lmList in the class
-        allFeature.setVars(lmList,img)
+        img = detector.find_hands(img)
+        #return the landmark_list
+        landmark_list = detector.get_landmark_position(img)
+        #Define the landmark_list in the class
+        allFeature.setVars(landmark_list,img)
 
         #Only if hand is detected:
         try:
-            if lmList:
+            if landmark_list:
                 if allFeature.handIsClose():
                     cv2.rectangle(img, (590, 10), (830, 100), (194, 214, 214), cv2.FILLED)
                     cv2.putText(img, "Hand Is Close",(600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
