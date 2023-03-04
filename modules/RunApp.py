@@ -68,8 +68,6 @@ def drawMenu(img, draw_menu, draw_back_to_menu):
 
     if draw_menu:
 
-        cv2.putText(img, "Enter in the terminal your selection", (120, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
-
         cv2.rectangle(img, up_left_rec_pos, right_down_rec_pos, backround_color, cv2.FILLED)
         cv2.rectangle(img, up_left_rec_pos, right_down_rec_pos, border_color, thickness=2)
         cv2.putText(img, "Drag rectangle - 1", (120, 160), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
