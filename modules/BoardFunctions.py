@@ -5,7 +5,6 @@ from screeninfo import get_monitors
 import os
 from dotenv import load_dotenv
 
-
 # Static function:
 def get_primary_screen_info():
     primary_screen_info = ""

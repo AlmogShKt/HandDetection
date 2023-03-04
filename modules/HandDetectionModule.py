@@ -166,6 +166,17 @@ class HandDetector:
                 self.distance_between_fingers_open_hand[i] = self.distance_between_fingers_open_hand[i] / count
 
     def initialize_hand_size(self, start_state=0):
+
+        def draw_rectangle_for_init_position(state):
+            color = (0, 0, 0)
+            if state == 0:
+                color = (255, 0, 0)
+            elif state == 1:
+                color = (0, 255, 0)
+
+            # Mark the center position
+            cv2.rectangle(img, (1100, 650), (850, 500), color, thickness=2)
+
         """
         Initializes the hand size in order to get a relative size for future calculations
         The user needs to place his hand in the middle of the screen for 5 seconds, after that the system will calc the
@@ -222,6 +233,9 @@ class HandDetector:
             self.landmark_list = self.get_landmark_position(img)
             # flip the img
             img = cv2.flip(img, 1)
+            if self.landmark_list:
+                # Mark the center position
+                draw_rectangle_for_init_position(current_state)
 
             if current_state == 0:
                 # instruction for user
@@ -235,7 +249,8 @@ class HandDetector:
                     cv2.putText(img, f"Hold for more {seconds_for_init} second ", (550, 300), cv2.FONT_HERSHEY_SIMPLEX,
                                 2,
                                 (255, 0, 0), 2)
-                    cv2.rectangle(img, (1100, 650), (1350, 500), (255, 0, 0), )
+
+
                     # Only if the HCP in in the middle of the screen and 1 sec passed - count down
                     if (is_point_in_circle(1100, 650, 100, self.get_hand_center_position()[0] + 220,
                                            self.get_hand_center_position()[1]) and (
@@ -250,12 +265,14 @@ class HandDetector:
             elif current_state == 1:
                 cv2.putText(img, f"Taking {6 - amount_of_samples_left} sampling of 5", (750, 80),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
+
                 # Only if the HCP in in the middle of the screen and 1 sec passed - count down
                 if self.landmark_list and (time.time() - start_time) >= 1:
                     # up==Update the avg
                     self.add_avg_distance(6 - amount_of_samples_left)
                     start_time = time.time()
                     amount_of_samples_left -= 1
+
                 # After taking 5 samples move to the next step
                 elif amount_of_samples_left == 0:
                     current_state += 1
