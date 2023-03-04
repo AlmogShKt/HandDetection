@@ -24,6 +24,8 @@ pip install opencv-python
 pip install mediapipe
 pip install matplotlib
 pip install mouse
+pip install screeninfo
+pip install pynput
 ```
 
 ```bash

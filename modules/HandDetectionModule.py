@@ -1,11 +1,13 @@
 import time
-
 import cv2
 import mediapipe as mp
 
+import os
+from dotenv import load_dotenv
+
 
 # Static function:
-def calcDistanceBetweenFingers(lm1, lm2):
+def calc_distance_between_fingers(lm1, lm2):
     """
     Calc the distance between 2 given landmarks
     :param lm1:
@@ -33,22 +35,23 @@ class HandDetector:
                  min_tracking_confidence: Minimum confidence value ([0.0, 1.0]) for the
                    hand landmarks to be considered tracked successfully. See details in
                """
-        self.distanceBetweenFingersOpenHand = [0, 0, 0, 0, 0]
-        self.mode = mode
-        self.maxHands = max_hands
-        self.minDetection = min_detection_confidence
-        self.minTracking = min_tracking_confidence
+        load_dotenv()
+        self.ROOT_PATH = os.getenv('ROOT_DIRECTORY')
 
-        self.mpHands = mp.solutions.hands
-        self.hands = self.mpHands.Hands(static_image_mode=self.mode, max_num_hands=self.maxHands,
-                                        min_detection_confidence=self.minDetection,
-                                        min_tracking_confidence=self.minTracking, model_complexity=0)
+        self.distance_between_fingers_open_hand = [0, 0, 0, 0, 0]
+        self.mode = mode
+        self.max_hands = max_hands
+        self.min_detection = min_detection_confidence
+        self.min_tracking = min_tracking_confidence
+
+        self.mp_hands = mp.solutions.hands
+        self.hands = self.mp_hands.Hands(static_image_mode=self.mode, max_num_hands=self.max_hands,
+                                         min_detection_confidence=self.min_detection,
+                                         min_tracking_confidence=self.min_tracking, model_complexity=0)
 
         self.mpDraw = mp.solutions.drawing_utils
 
-
-
-    def findHands(self, img, draw=True):
+    def find_hands(self, img, draw=True):
         """
         Finding the hands
         :param img:
@@ -63,27 +66,26 @@ class HandDetector:
         if self.result.multi_hand_landmarks:
             for handLms in self.result.multi_hand_landmarks:
                 if draw:
-                    self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
+                    self.mpDraw.draw_landmarks(img, handLms, self.mp_hands.HAND_CONNECTIONS)
         return img
 
-    def getLendmarkPos(self, img, handNo=0, draw=True):
+    def get_landmark_position(self, img, hand_number=0, draw=True):
         """
         Getting the landmarks location on array.
         Can draw on the center of the hand a circle
         :param img: the captured img
-        :param handNo: Amount of hand to get
+        :param hand_number: Amount of hand to get
         :param draw: True by default, will add a circle on HCP
         :return: the array with all the 20 landmarks
         """
-        newList = []
         # the list with all the landmarks
-        self.lmList = []
+        self.landmark_list = []
 
         # Only if there is detection
         if self.result.multi_hand_landmarks:
             # Take only 1 hand (Hand number 0)
-            detectedHand = self.result.multi_hand_landmarks[handNo]
-            for id, lm in enumerate(detectedHand.landmark):
+            detected_hand = self.result.multi_hand_landmarks[hand_number]
+            for lm_id, lm in enumerate(detected_hand.landmark):
                 # get x,y landmarks positions
                 lmX = lm.x
                 lmY = lm.y
@@ -92,92 +94,98 @@ class HandDetector:
                 h, w, c = img.shape
                 cx, cy = int(lmX * w), int(lmY * h)
 
-                # print(f"ID:{id}, {cx, cy}")
-                self.lmList.append([id, cx, cy])
+                self.landmark_list.append([lm_id, cx, cy])
 
-                newList.append([id, cx, cy])
-                #print(newList)
-
-                if draw and len(self.lmList) > 9:
+                if draw and len(self.landmark_list) > 9:
                     # Only when there is at least 9 landmarks
                     # Calc the center of the hand
-                    self.calcHCP()
+                    self.calculate_hand_center_position()
                     # Draw the Circle on the center of the hand
-                    cv2.circle(img, self.handCenterPos, 10, (154, 239, 192), cv2.FILLED)
-            self.setFingers()
-            return self.lmList
+                    cv2.circle(img, self.hand_center_position, 10, (154, 239, 192), cv2.FILLED)
+            self.set_fingers()
+            return self.landmark_list
 
-    def calcHCP(self):
+    def calculate_hand_center_position(self):
         """
-        Calc the hand center position
+        calculate the hand center position
         Taking the middle of the line between lm 0 to ln 9
         """
-        xHandCenter = int((self.lmList[9][1] + self.lmList[0][1]) / 2)
-        yHandCenter = int((self.lmList[9][2] + self.lmList[0][2]) / 2)
-        self.handCenterPos = (xHandCenter, yHandCenter)
+        hand_center_x = int((self.landmark_list[9][1] + self.landmark_list[0][1]) / 2)
+        hand_center_y = int((self.landmark_list[9][2] + self.landmark_list[0][2]) / 2)
+        self.hand_center_position = (hand_center_x, hand_center_y)
 
-    def getHCP(self):
+    def get_hand_center_position(self):
         """
         :return: the Hand Center Position
         """
-        return self.handCenterPos
+        return self.hand_center_position
 
-    def getlmList(self):
+    def get_landmark_list(self):
         """
         :return: landmarks list
         """
-        return self.lmList
+        return self.landmark_list
 
-    def setFingers(self):
+    def set_fingers(self):
         """
         Set all relevant landmarks as class variables
         :return:
         """
-        self.lm0 = self.lmList[0][1:3]
-        self.lm2 = self.lmList[2][1:3]
-        self.lm4 = self.lmList[4][1:3]
-        self.lm3 = self.lmList[3][1:3]
-        self.lm5 = self.lmList[5][1:3]
-        self.lm8 = self.lmList[8][1:3]
-        self.lm9 = self.lmList[9][1:3]
-        self.lm12 = self.lmList[12][1:3]
-        self.lm13 = self.lmList[13][1:3]
-        self.lm16 = self.lmList[16][1:3]
-        self.lm17 = self.lmList[17][1:3]
-        self.lm20 = self.lmList[20][1:3]
+        self.lm0 = self.landmark_list[0][1:3]
+        self.lm2 = self.landmark_list[2][1:3]
+        self.lm4 = self.landmark_list[4][1:3]
+        self.lm3 = self.landmark_list[3][1:3]
+        self.lm5 = self.landmark_list[5][1:3]
+        self.lm8 = self.landmark_list[8][1:3]
+        self.lm9 = self.landmark_list[9][1:3]
+        self.lm12 = self.landmark_list[12][1:3]
+        self.lm13 = self.landmark_list[13][1:3]
+        self.lm16 = self.landmark_list[16][1:3]
+        self.lm17 = self.landmark_list[17][1:3]
+        self.lm20 = self.landmark_list[20][1:3]
 
-    def addAvgDistance(self, count):
+    def add_avg_distance(self, count):
         """
         Create avg of the distance between top of each finger
         :param count: the current count of sum
         :return:
         """
-        self.distanceBetweenFingersOpenHand[0] = (int(self.distanceBetweenFingersOpenHand[0]
-                                                      + calcDistanceBetweenFingers(self.lm4, self.lm8)))
-        self.distanceBetweenFingersOpenHand[1] = (int(self.distanceBetweenFingersOpenHand[1]
-                                                      + calcDistanceBetweenFingers(self.lm8, self.lm12)))
-        self.distanceBetweenFingersOpenHand[2] = (int(self.distanceBetweenFingersOpenHand[2]
-                                                      + calcDistanceBetweenFingers(self.lm12, self.lm16)))
-        self.distanceBetweenFingersOpenHand[3] = (int(self.distanceBetweenFingersOpenHand[3]
-                                                      + calcDistanceBetweenFingers(self.lm16, self.lm20)))
-        self.distanceBetweenFingersOpenHand[4] = (int(self.distanceBetweenFingersOpenHand[4]
-                                                      + calcDistanceBetweenFingers(self.lm20, self.lm4)))
+        self.distance_between_fingers_open_hand[0] = (int(self.distance_between_fingers_open_hand[0]
+                                                          + calc_distance_between_fingers(self.lm4, self.lm8)))
+        self.distance_between_fingers_open_hand[1] = (int(self.distance_between_fingers_open_hand[1]
+                                                          + calc_distance_between_fingers(self.lm8, self.lm12)))
+        self.distance_between_fingers_open_hand[2] = (int(self.distance_between_fingers_open_hand[2]
+                                                          + calc_distance_between_fingers(self.lm12, self.lm16)))
+        self.distance_between_fingers_open_hand[3] = (int(self.distance_between_fingers_open_hand[3]
+                                                          + calc_distance_between_fingers(self.lm16, self.lm20)))
+        self.distance_between_fingers_open_hand[4] = (int(self.distance_between_fingers_open_hand[4]
+                                                          + calc_distance_between_fingers(self.lm20, self.lm4)))
 
         if count == 5:
-            for i in range(len(self.distanceBetweenFingersOpenHand)):
-                self.distanceBetweenFingersOpenHand[i] = self.distanceBetweenFingersOpenHand[i] / count
-                #print(self.distanceBetweenFingersOpenHand[i])
+            for i in range(len(self.distance_between_fingers_open_hand)):
+                self.distance_between_fingers_open_hand[i] = self.distance_between_fingers_open_hand[i] / count
 
-    def initHandSize(self, StatState=0):
+    def initialize_hand_size(self, start_state=0):
+
+        def draw_rectangle_for_init_position(state):
+            color = (0, 0, 0)
+            if state == 0:
+                color = (255, 0, 0)
+            elif state == 1:
+                color = (0, 255, 0)
+
+            # Mark the center position
+            cv2.rectangle(img, (1100, 650), (850, 500), color, thickness=2)
+
         """
         Initializes the hand size in order to get a relative size for future calculations
-        The user needs to place his hand in the middle of the screen for 5 second, after that the system will calc the
+        The user needs to place his hand in the middle of the screen for 5 seconds, after that the system will calc the
         avg distance between his finger, and save it.
-        :param StatState: Option to start the rin form specific state for test, def should be 0!
+        :param start_state: Option to start the rin form specific state for test, def should be 0!
         :return: True when done the process
         """
 
-        def pointIsInCircle(center_x, center_y, R, p_x, p_y):
+        def is_point_in_circle(center_x, center_y, R, p_x, p_y):
             """
             Check if given point is in given circle
             :param center_x: X center of the circle
@@ -193,14 +201,14 @@ class HandDetector:
 
         # All the sates in the process:
         # Waiting for user to place and hold the hand in the middle of the screen for 5 second
-        initStates = {0: "Waiting",
-                      # Taking 5 samples of the distance of the tip of each finger, and calc the avg of that
-                      1: "Taking Samples",
-                      # Finish initialize - ready to start the program
-                      2: "Done"}
+        init_states = {0: "Waiting",
+                       # Taking 5 samples of the distance of the tip of each finger, and calc the avg of that
+                       1: "Taking Samples",
+                       # Finish initialize - ready to start the program
+                       2: "Done"}
 
         # The current state, start with 0
-        currentState = StatState
+        current_state = start_state
 
         # The distance between the top of each finger
         # place 0: dis between lm4-lm8
@@ -210,87 +218,91 @@ class HandDetector:
         # place 4: dis between lm20-lm4
 
         # Hold the hand for 5 sec before start taking samples
-        secForInit = 5
-
+        seconds_for_init = 5
         # the amount of samples to take fot the avg
-        amountOfSamplesLeft = 5
-
+        amount_of_samples_left = 5
         # Wait 5 sec before end the proses
-        holdFor5Sec = 5
+        hold_for_seconds = 5
 
-        startTime = time.time()
+        start_time = time.time()
         cap = cv2.VideoCapture(0)
         flag = True
         while flag:
             success, img = cap.read()
-            img = self.findHands(img)
-            self.LmList = self.getLendmarkPos(img)
+            img = self.find_hands(img)
+            self.landmark_list = self.get_landmark_position(img)
             # flip the img
             img = cv2.flip(img, 1)
+            if self.landmark_list:
+                # Mark the center position
+                draw_rectangle_for_init_position(current_state)
 
-            if currentState == 0:
+            if current_state == 0:
                 # instruction for user
                 cv2.rectangle(img, (10, 10), (1350, 100), (194, 214, 214), cv2.FILLED)
                 cv2.putText(img, f"Lets Start the initialization! Open and place your hand in the middle of the screen",
                             (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
                 # Only when hand is detect
-                if self.lmList:
+                if self.landmark_list:
                     cv2.putText(img, f"Place your hand in the middle of the screen", (300, 200),
                                 cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
-                    cv2.putText(img, f"Hold for more {secForInit} second ", (550, 300), cv2.FONT_HERSHEY_SIMPLEX, 2,
+                    cv2.putText(img, f"Hold for more {seconds_for_init} second ", (550, 300), cv2.FONT_HERSHEY_SIMPLEX,
+                                2,
                                 (255, 0, 0), 2)
+
+
                     # Only if the HCP in in the middle of the screen and 1 sec passed - count down
-                    if (pointIsInCircle(1100, 650, 100, self.getHCP()[0] + 220, self.getHCP()[1]) and (
-                            time.time() - startTime >= 1)):
-                        secForInit -= 1
+                    if (is_point_in_circle(1100, 650, 100, self.get_hand_center_position()[0] + 220,
+                                           self.get_hand_center_position()[1]) and (
+                            time.time() - start_time >= 1)):
+                        seconds_for_init -= 1
                         # Update the start time
-                        startTime = time.time()
+                        start_time = time.time()
                     # When 5 sec passed - move to the next step
-                    if secForInit == 0:
-                        currentState += 1
+                    if seconds_for_init == 0:
+                        current_state += 1
             # Start taking samples of the hand, and update the avg
-            elif currentState == 1:
-                cv2.putText(img, f"Taking {6 - amountOfSamplesLeft} sampling of 5", (750, 80),
+            elif current_state == 1:
+                cv2.putText(img, f"Taking {6 - amount_of_samples_left} sampling of 5", (750, 80),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
+
                 # Only if the HCP in in the middle of the screen and 1 sec passed - count down
-                if self.lmList and (time.time() - startTime) >= 1:
+                if self.landmark_list and (time.time() - start_time) >= 1:
                     # up==Update the avg
-                    self.addAvgDistance(6 - amountOfSamplesLeft)
-                    startTime = time.time()
-                    amountOfSamplesLeft -= 1
+                    self.add_avg_distance(6 - amount_of_samples_left)
+                    start_time = time.time()
+                    amount_of_samples_left -= 1
+
                 # After taking 5 samples move to the next step
-                elif amountOfSamplesLeft == 0:
-                    currentState += 1
+                elif amount_of_samples_left == 0:
+                    current_state += 1
             # Done!
-            elif currentState == 2:
+            elif current_state == 2:
                 wait_key = 0
-                print(holdFor5Sec)
-                img = cv2.imread("/modules/All_Set_img.png")
+                print(hold_for_seconds)
+                path_all_set = fr'{self.ROOT_PATH}photos/All_Set_img.png'
+                img = cv2.imread(path_all_set)
                 # Show the image for 5 sec the end the init' process
-            elif currentState == 9:
+            elif current_state == 9:
                 return
             try:
-                print("h")
-                cv2.imshow(initStates[currentState], img)
-
+                cv2.imshow(init_states[current_state], img)
                 cv2.waitKey(wait_key)
                 if wait_key == 0:
                     cv2.destroyAllWindows()
                     break
+            except Exception as err:
+                print(init_states[current_state])
+                print(f"Failed on initHands - {err}")
 
-            except:
-                print(initStates[currentState])
-                print("Failed on initHands")
-
-    def getdistanceBetweenFingersOpenHand(self):
-        return self.distanceBetweenFingersOpenHand
+    def get_distance_between_fingers_open_hand(self):
+        return self.distance_between_fingers_open_hand
 
 
 # test!
 def main():
     D = HandDetector()
-
-    D.initHandSize()
+    D.initialize_hand_size()
 
 
 if __name__ == "__main__":

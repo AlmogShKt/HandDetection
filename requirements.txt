@@ -1,4 +1,7 @@
 opencv-python==4.5.5.62
 mediapipe
 matplotlib
-mouse s
+mouse
+screeninfo
+pynput
+python-dotenv
