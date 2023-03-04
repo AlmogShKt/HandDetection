@@ -42,10 +42,10 @@ pip install -r requirements.txt
 ## Features
 * First initialize your hand size:
 
-  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/Demo-Init_AdobeExpress.gif)
+  - ![Menu](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/Demo-Init_AdobeExpress.gif)
 
 * Select the feature you want:
-  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/Demo-Init_AdobeExpress.gif)
+  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/menuDemo_AdobeExpress.gif)
 
 
 
@@ -57,19 +57,13 @@ pip install -r requirements.txt
 * Control your mouse using the hand!
 
   - Use your hand to control the mouse posotion, close the hand to click and open the hand to relase
-  - ![MoveMouse](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-MoveMouse.gif)
+  - ![MoveMouse](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/Demo-MoveMouse.gif)
   
 
-* Draw with your hand!
+* Draeg rectangle with your hand!
 
-  - ![DragRectangel](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-DragRec_AdobeExpress.gif)
+  - ![DragRectangel](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/DragRectangle_AdobeExpress.gif)
 
-
-
-
-## Download
-
-You can 
 
 ## Credits
 
