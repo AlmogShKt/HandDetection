@@ -42,11 +42,16 @@ pip install -r requirements.txt
 ## Features
 * First initialize your hand size:
 
-  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-Init_AdobeExpress.gif)
+  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/Demo-Init_AdobeExpress.gif)
+
+* Select the feature you want:
+  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/Demo-Init_AdobeExpress.gif)
+
+
 
 * Detect close hand
 
-  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/Demo/Demo-IsCloseHand.gif)
+  - ![InitHand](https://github.com/AlmogShKt/HandDetection/blob/master/photos/Demo/Demo-IsCloseHand.gif)
 
 
 * Control your mouse using the hand!
