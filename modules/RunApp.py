@@ -1,12 +1,14 @@
 from HandDetectionModule import HandDetector, calc_distance_between_fingers
 from HandFunctions import Features
+from BoardFunctions import Board
 import cv2
 import time
+
 
 def drawMenu(img, draw):
     if draw:
         cv2.rectangle(img, (70, 10), (310, 100), (153, 153, 253), cv2.FILLED)
-        cv2.rectangle(img, (70, 10), (310, 100), (0,0 , 255))
+        cv2.rectangle(img, (70, 10), (310, 100), (0, 0, 255))
         cv2.putText(img, "Function 1", (100, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
 
         cv2.rectangle(img, (70, 110), (310, 200), (153, 153, 253), cv2.FILLED)
@@ -28,9 +30,8 @@ def drawMenu(img, draw):
         return img
     return img
 
+
 def main():
-
-
     # previous an current time
     pre_time = 0
     cur_time = 0
@@ -41,37 +42,36 @@ def main():
     detector = HandDetector()
     allFeature = Features(detector)
 
-    #detector.initialize_hand_size(2)
+    # detector.initialize_hand_size(2)
     print("Done init, starting app...")
-    i=0
+    i = 0
     while True:
         success, img = cap.read()
-        #Draw the functions menu
-        img = drawMenu(cv2.flip(img,1), False)
+        # Draw the functions menu
+        img = drawMenu(cv2.flip(img, 1), False)
 
-        #draw hands landmarks on the img
+        # draw hands landmarks on the img
         img = detector.find_hands(img)
-        #return the landmark_list
+        # return the landmark_list
         landmark_list = detector.get_landmark_position(img)
-        #Define the landmark_list in the class
-        allFeature.set_variables(landmark_list,img)
+        # Define the landmark_list in the class
+        allFeature.set_variables(landmark_list, img)
 
-        #Only if hand is detected:
+        # Only if hand is detected:
         try:
             if landmark_list:
                 if allFeature.hand_is_close():
                     cv2.rectangle(img, (590, 10), (830, 100), (194, 214, 214), cv2.FILLED)
-                    cv2.putText(img, "Hand Is Close",(600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+                    cv2.putText(img, "Hand Is Close", (600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
                 img = allFeature.drag_rectangle()
                 i += 1
-                #board = allFeature.free_draw(i,paint_color='pink', thickness='large')
-                #cv2.imshow('board',board)
+                # board = allFeature.free_draw(i,paint_color='pink', thickness='large')
+                # cv2.imshow('board',board)
 
             else:
                 cv2.putText(img, "Hand is not detected", (600, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
         except Exception as e:  # work on python 3.x
             print('Failed app ' + str(e))
-
 
         # Calc the fps
         cur_time = time.time()
