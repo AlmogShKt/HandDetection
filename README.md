@@ -13,9 +13,10 @@
   <a href="#how-to-use">How To Use</a> •
   <a href="#download">Download</a> •
   
-    <p align="center"> <img src="https://komarev.com/ghpvc/?username=HandDetection&label=Repo%20views&color=0e75b6&style=flat" alt="DogFeeder" /> </p>
 
 </p>
+<p align="center"> <img src="https://komarev.com/ghpvc/?username=HandDetection&label=Repo%20views&color=0e75b6&style=flat"  /> </p>
+
 
 ## How To Use
 
